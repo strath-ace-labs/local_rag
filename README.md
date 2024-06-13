@@ -1,26 +1,34 @@
+# ESA Document QA 
 
-# Requirements 
+This project provides tools for question-answering on ESA final report documents.
+
+## Requirements
 
 - Linux OS
 - At least 8GB of random access memory (RAM) available (GPU recommended)
-- Python 3.11 installation 
+- Python 3.11 installation
 
-# Installation
+
+## Installation
 
 Clone the repository:
 
-git clone <repository_url>
-cd <repository_directory>
+```sh
+git clone https://github.com/PaulDrm/satnex_document_qa
+cd satnex_document_qa
+```
 
 Install the required Python packages into new environment:
 
+```sh
 pip install -r requirements.txt
+```
 
-# Setup
+## Setup
 
 - Insert ESA final report documents in folder "./datasets/esa_documents/"
 - Run "preprocess_esa_documents.sh" 
 
-# Running QA 
+## Running QA 
 
 - open "qa_notebook.ipynb" and follow instructions there
