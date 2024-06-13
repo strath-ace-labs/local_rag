@@ -32,3 +32,13 @@ pip install -r requirements.txt
 ## Running QA 
 
 - open "qa_notebook.ipynb" and follow instructions there
+
+## Features 
+
+### 1. Input field in qa_notebook.ipynb:
+
+![Screenshot](qa_notebook_widget.png)
+
+### 2. Visualisation of relevance of document chunks to generated answer
+
+![Screenshot](qa_visualisation.png)
