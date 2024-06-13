@@ -157,7 +157,7 @@ class HuggingfaceLLM():
             "device": self.device
         }
 
-        print(log_entry)
+        #print(log_entry)
         # Log to JSON file
         self.log_to_json(log_entry)
 
