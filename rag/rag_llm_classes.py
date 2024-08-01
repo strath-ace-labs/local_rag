@@ -93,7 +93,6 @@ class HuggingfaceLLM():
         output =output[len(self.tokenizer.decode(self.tokenizer.encode(prompt))):]
         return output
     
-
     def llm(self,
         prompt,
         ):
@@ -234,13 +233,13 @@ class LlamacppLLM(HuggingfaceLLM):
 
         return response
     
-def load_cpu_model(model="QuantFactory/Meta-Llama-3-8B-Instruct-GGUF", filename="Meta-Llama-3-8B-Instruct.Q5_K_M.gguf"):
+def load_cpu_model(model_name="QuantFactory/Meta-Llama-3-8B-Instruct-GGUF", filename="Meta-Llama-3-8B-Instruct.Q5_K_M.gguf"):
     script_dir = "../"
     output_folder = f"{script_dir}cpu_models/"
     if not os.path.exists(f"{output_folder}{filename}"):
         print("Downloading model...")
         output_file = output_folder
-        url =hf_hub_download(model, filename= filename, local_dir = output_file)
+        url =hf_hub_download(model_name, filename= filename, local_dir = output_file)
 
     tokenizer_dict = {"Meta-Llama-3-8B-Instruct.Q5_K_M.gguf" : "meta-llama/Meta-Llama-3-8B-Instruct"}
 
@@ -252,7 +251,7 @@ def load_cpu_model(model="QuantFactory/Meta-Llama-3-8B-Instruct-GGUF", filename=
         n_ctx=4096, # Uncomment to increase the context window
         )
 
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_dict[filename])
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_dict.get(filename, "meta-llama/Meta-Llama-3-8B-Instruct"))
 
     llm = LlamacppLLM(model, tokenizer)
 
@@ -293,44 +292,50 @@ def load_gpu_model(model_name = "meta-llama/Meta-Llama-3-8B-Instruct", device='c
     
     return llm
     
-def load_inference_model(device=None):
-
-    "Depending on availability of system resources loads either a GPU or CPU model"
-
+def load_inference_model(**keyargs):
+    """
+    Depending on availability of system resources loads either a GPU or CPU model
+    
+    """
+    device = keyargs.get('device', None)
+    
     if device == None:
 
         device = ("cuda" if torch.cuda.is_available() else "cpu")
 
     if device == "cuda":
+        
+        print("Loading GPU model")
+        gpu_model = keyargs.get('model_name', "meta-llama/Meta-Llama-3-8B-Instruct")
+
+        ## Calculates available GPU VRAM and loads a GPU model if there is enough VRAM available.
+        total_vram = torch.cuda.get_device_properties(0).total_memory / (1024 ** 3)  # Convert bytes to GB
+        reserved_vram = torch.cuda.memory_reserved(0) / (1024 ** 3)  # Convert bytes to GB
+        allocated_vram = torch.cuda.memory_allocated(0) / (1024 ** 3)  # Convert bytes to GB
+        free_vram = total_vram - reserved_vram
+        
+        if free_vram > 16: 
             print("Loading GPU model")
-        #try: 
-            ## Calculates available GPU VRAM and loads a GPU model if there is enough VRAM available.
-            total_vram = torch.cuda.get_device_properties(0).total_memory / (1024 ** 3)  # Convert bytes to GB
-            reserved_vram = torch.cuda.memory_reserved(0) / (1024 ** 3)  # Convert bytes to GB
-            allocated_vram = torch.cuda.memory_allocated(0) / (1024 ** 3)  # Convert bytes to GB
-            free_vram = total_vram - reserved_vram
+            llm = load_gpu_model(model_name=gpu_model)
+        elif free_vram > 12: 
+            print("Loading 8-bit quantized model")
+            quant_config = BitsAndBytesConfig(load_in_8bit=True)
+            llm = load_gpu_model(model_name=gpu_model, quantization_config = quant_config)
+        
+        elif free_vram > 8: 
+            print("Loading 4-bit quantized model")
+            quant_config = BitsAndBytesConfig(load_in_4bit=True)
+            llm = load_gpu_model(model_name=gpu_model, quantization_config = quant_config)
+        
+        else:
+            print("Fallback to CPU model, not enough VRAM available")
             
-            if free_vram > 16: 
-                print("Loading GPU model")
-                llm = load_gpu_model()
-            elif free_vram > 12: 
-                print("Loading 8-bit quantized model")
-                quant_config = BitsAndBytesConfig(load_in_8bit=True)
-                llm = load_gpu_model(quantization_config = quant_config)
-            
-            elif free_vram > 8: 
-                print("Loading 4-bit quantized model")
-                quant_config = BitsAndBytesConfig(load_in_4bit=True)
-                llm = load_gpu_model(quantization_config = quant_config)
-            
-            else:
-                print("Fallback to CPU model, not enough VRAM available")
-                llm = load_cpu_model()
-        #except: 
-            #print("Loading CPU model")
-            #llm = load_cpu_model()
+            llm = load_cpu_model()
 
     else:
-        llm = load_cpu_model()
 
+        cpu_model = keyargs.get('model_name', "QuantFactory/Meta-Llama-3-8B-Instruct-GGUF")
+        file_name = keyargs.get('file_name', "Meta-Llama-3-8B-Instruct.Q5_K_M.gguf")
+        llm = load_cpu_model(model_name=cpu_model, filename=file_name)
+        
     return llm

@@ -14,8 +14,7 @@ def semantic_search(query, docs, model_emb, top_k=10, verbose = False):
     cos_scores = util.cos_sim(query_embedding, embeds)[0]
     
     ## torch order cos_scores
-    cos_scores
-    top_k = 10
+    #top_k = 10
     #top_results = torch.topk(cos_scores, k=top_k)
     top_results = torch.topk(cos_scores, k=cos_scores.shape[0])
     if verbose: 
@@ -24,10 +23,8 @@ def semantic_search(query, docs, model_emb, top_k=10, verbose = False):
         print("Input query:", query)
         print(f"\nTop most similar entries in Knowledge Graph:")
 
-        #iids = [iids[idx] for idx in top_results.indices.tolicst()]
-        #names= get_names([iids[idx] for idx in top_results.indices.tolist()], session) # inputs['artifact']['type'],
-        # scores = [top_results[idx] for idx in top_results.indices.tolist()]
         # print(names)
+
         for score, idx in zip(top_results[0], top_results[1]):
         #for score, name in zip(top_results[0], names):
             # print(iids[idx], "(Score: {:.4f})".format(score))
