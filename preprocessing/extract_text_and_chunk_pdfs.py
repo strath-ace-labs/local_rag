@@ -38,7 +38,7 @@ def split_tokens_with_overlap(tokens, chunk_size, overlap):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_name", type=str, default="meta-llama/Meta-Llama-3-8B-Instruct", help='model name')
-    parser.add_argument("--embedding_model", type=str, default="BAAI/bge-large-zh-v1.5")
+    parser.add_argument("--embedding_model", type=str, default="BAAI/bge-large-en-v1.5")
     parser.add_argument('--input_path', type=str, help='input path')
     parser.add_argument('--output_path', type=str, help='output path')
     parser.add_argument('--chunk_size', type=int, default=1024)
@@ -89,6 +89,7 @@ def main():
                         
             else: 
                 print(file)
+                
         except Exception as e:
             print("Exception Occured: ", file)
             pass
