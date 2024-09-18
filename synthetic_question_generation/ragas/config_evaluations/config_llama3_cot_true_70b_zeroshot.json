@@ -1,0 +1,10 @@
+{"input_path": "../../datasets/example_questions/esa_queries_llama3_70b_cks_512.json",
+"model_name": "meta-llama/Meta-Llama-3-70B-Instruct",
+"cot": true,
+"internal_cot": false,
+"early_stopping": false,
+"output_path": "results/results_llama3_70b_zeroshot.json",
+"method": "local",
+"one_shot": false,
+"three_shot": false
+}

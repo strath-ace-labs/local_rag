@@ -1,0 +1,10 @@
+{"input_path": "../../datasets/example_questions/esa_queries_llama3_70b_cks_512.json",
+"model_name": "google/gemma-2-2b-it",
+"cot": true,
+"internal_cot": false,
+"early_stopping": false,
+"output_path": "results/results_gemma_2b_instruct_zeroshot.json",
+"method": "local",
+"one_shot": false,
+"three_shot": false
+}
