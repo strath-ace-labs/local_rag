@@ -59,4 +59,4 @@ pip install -r requirements.txt
 
 ### 2. Visualisation of relevance of document chunks to generated answer
 
-![Screenshot](qa_visualisation.png)
+![Visualisation of relevance of document chunks to generated answer](validation_visualisation.gif)
