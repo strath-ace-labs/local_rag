@@ -1,7 +1,12 @@
 # Local RAG Question Answering Notebook
 
-This project provides a minimal implementation for question-answering on PDF documents with local hardware. 
-It uses llama.cpp Python bindings for CPU support and implements a demo in a Jupyter Notebook. The features includes a preprocessing and chunking pipeline for PDF documents as well as a visualisation plugin to compare generated responses with the source documents to control the model answer. 
+This project offers a lightweight implementation for question-answering on PDF documents using local hardware. It leverages llama.cpp Python bindings for CPU support and showcases a demo in a Jupyter Notebook. Key features include:
+
+A preprocessing and chunking pipeline for PDF documents
+PDF extraction implemented with AllenAI's Papermage (https://github.com/allenai/papermage) 
+A visualization plugin to compare generated responses with source documents, enabling model answer verification
+
+The implementation demonstrates how to perform document-based question-answering without relying on cloud services, making it suitable for scenarios requiring data privacy or offline processing.
 
 ## Requirements
 
