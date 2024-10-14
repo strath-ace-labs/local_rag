@@ -1,21 +1,22 @@
-# ESA Document QA 
+# Local RAG Question Answering Notebook
 
-This project provides tools for question-answering on ESA final report documents.
+This project provides a minimal implementation for question-answering on PDF documents with local hardware. 
+It uses llama.cpp Python bindings for CPU support and implements a demo in a Jupyter Notebook. The features includes a preprocessing and chunking pipeline for PDF documents as well as a visualisation plugin to compare generated responses with the source documents to control the model answer. 
 
 ## Requirements
 
-- Linux OS
-- At least 8GB of random access memory (RAM) available (GPU recommended)
-- Python 3.11 installation
-
+- At least 10GB of random access memory (RAM) available for CPU inference
+- (Nvidia GPU recommended for faster inference with at least 18GB VRAM)
+- Python 3.11 
 
 ## Installation
 
 Clone the repository:
 
 ```sh
-git clone https://github.com/PaulDrm/satnex_document_qa
-cd satnex_document_qa
+git clone https://github.com/strath-ace-labs/local_rag
+
+cd local_rag
 ```
 
 Install the required Python packages into new environment:
@@ -26,8 +27,8 @@ pip install -r requirements.txt
 
 ## Setup
 
-- Insert ESA final report documents in folder "./datasets/esa_documents/"
-- Run "preprocess_esa_documents.sh" 
+- Insert your documents into a "./datasets/<your_dataset>/"
+- Run a script similar to "preprocess_nasa_teaching_documents.sh" preprocess PDFs and chunk texts accordingly
 
 ## Running QA 
 
@@ -47,9 +48,9 @@ pip install -r requirements.txt
       model = rag_llm_classes.load_inference_model(model_name='Nexusflow/Starling-LM-7B-beta', device='cuda')
       ```
   - Check for new models at [LMSYS Arena](https://arena.lmsys.org/).
-- **Add Tokenizer** Change tokenizer_dict variable in in rag_llm_classes.load_cpu_model to include the tokenizer to your model (fallback llama3 tokenizer)
-- **Default Model**: If not specified, the standard model loaded is Llama-3.
-- **License Agreement**: Note that some models may require a license agreement before use.
+  - **Add Tokenizer** Change tokenizer_dict variable in in rag_llm_classes.load_cpu_model to include the tokenizer to your model (fallback llama3 tokenizer)
+  - **Default Model**: If not specified, the standard model loaded is Llama-3.
+  - **License Agreement**: Note that some models may require a license agreement before use.
 
 ## Features 
 

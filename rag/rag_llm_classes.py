@@ -45,7 +45,7 @@ class HuggingfaceLLM():
                 "do_sample": True,
                 "top_p": 0.6,
                 "top_k": 0,
-                "temperature": 0.9,
+                "temperature": 0.2,
             }
 
         self.stopping_criteria = stopping_criteria
@@ -98,13 +98,16 @@ class HuggingfaceLLM():
         ):
         inputs = self.tokenizer(prompt, return_tensors="pt")
         input_ids = inputs["input_ids"].to(self.device)
+        attention_mask = inputs["attention_mask"].to(self.device)
         generation_config = GenerationConfig(
              **self.generate_config_dict,
          )    
+        generation_config.pad_token_id = self.tokenizer.eos_token_id
         with torch.no_grad():
             
             generation_output = self.model.generate(
                 input_ids=input_ids,
+                attention_mask=attention_mask,
                 return_dict_in_generate=True,
                 generation_config=generation_config,
                 stopping_criteria=self.stopping_criteria,
@@ -248,7 +251,7 @@ def load_cpu_model(model_name="QuantFactory/Meta-Llama-3-8B-Instruct-GGUF", file
         tokenizer= llama_cpp.llama_tokenizer.LlamaHFTokenizer.from_pretrained(tokenizer_dict[filename]),
         # n_gpu_layers=-1, # Uncomment to use GPU acceleration
         # seed=1337, # Uncomment to set a specific seed
-        n_ctx=4096, # Uncomment to increase the context window
+        n_ctx=6144, # Uncomment to increase the context window
         )
 
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_dict.get(filename, "meta-llama/Meta-Llama-3-8B-Instruct"))
@@ -257,7 +260,7 @@ def load_cpu_model(model_name="QuantFactory/Meta-Llama-3-8B-Instruct-GGUF", file
 
     return llm 
 
-def load_gpu_model(model_name = "meta-llama/Meta-Llama-3-8B-Instruct", device='cuda', quantization_config = None):
+def load_gpu_model(model_name = "meta-llama/Llama-3.1-8B-Instruct", device='cuda', quantization_config = None):
 
     MAX_NEW_TOKENS=600
 
@@ -272,6 +275,9 @@ def load_gpu_model(model_name = "meta-llama/Meta-Llama-3-8B-Instruct", device='c
                 }
 
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.pad_token_id = tokenizer.eos_token_id
 
     model = AutoModelForCausalLM.from_pretrained(
                     model_name,

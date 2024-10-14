@@ -2,12 +2,16 @@
 
 import nltk
 from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize, sent_tokenize
 from rank_bm25 import BM25Okapi
+
 import numpy as np
 
 nltk.download('punkt')
+nltk.download('punkt_tab')
 nltk.download('stopwords')
+nltk.download('wordnet')
 
 def preprocess_text(text, stop_words):
     #print(text)
@@ -19,6 +23,20 @@ def preprocess_text(text, stop_words):
         filtered_sentence = [w.lower() for w in word_tokens if w.lower() not in stop_words and w.isalnum()]
         tokenized_sentences.append(filtered_sentence)
 
+    return sentences, tokenized_sentences
+
+def preprocess_text(text, stop_words):
+    lemmatizer = WordNetLemmatizer()
+    sentences = sent_tokenize(text)
+    tokenized_sentences = []
+    for sentence in sentences:
+        word_tokens = word_tokenize(sentence)
+        filtered_sentence = [
+            lemmatizer.lemmatize(w.lower())
+            for w in word_tokens
+            if w.lower() not in stop_words and w.isalnum()
+        ]
+        tokenized_sentences.append(filtered_sentence)
     return sentences, tokenized_sentences
 
 def find_snippet(docs, queries, num_top_returned=1):

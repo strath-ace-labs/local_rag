@@ -70,29 +70,47 @@ def main():
     ## extract the text from the pdf files and split them into smaller chunks 
     for file in tqdm(os.listdir(input_path)):
 
-        try:
-            if file.endswith(".pdf"):
-                
-                ## join input path with file name to get full path 
-                file_path = os.path.join(input_path, file)
+        #try:
+        if file.endswith(".pdf"):
+            
+            ## join input path with file name to get full path 
+            file_path = os.path.join(input_path, file)
 
-                ## run papermage recipe to get document object
-                doc = recipe.run(file_path)
-                ## Joins all pages into one text 
-                full_text = "".join([par.text for par in doc.pages])                  
-                tokenized_input = tokenizer(full_text, add_special_tokens=False)
+            ## run papermage recipe to get document object
+            doc = recipe.run(file_path)
+            ## Joins all pages into one text 
+            full_text = "".join([par.text for par in doc.pages])                  
+            tokenized_input = tokenizer(full_text, add_special_tokens=False)
+            
+            ## chunks the input into smaller chunks 
+            chunks = split_tokens_with_overlap(tokenized_input['input_ids'], chunk_size, overlap)
+            for chunk in chunks:
+                paragraphs.append({"document": doc.titles[0].text, "text": tokenizer.decode(chunk)})
+
+        elif file.endswith(".txt"):
+            
+            ## join input path with file name to get full path 
+            file_path = os.path.join(input_path, file)
+
+            with open(file_path, 'r') as f:
+                full_text = f.read()
+            
+            tokenized_input = tokenizer(full_text, add_special_tokens=False)
+
+            ## chunks the input into smaller chunks
+            chunks = split_tokens_with_overlap(tokenized_input['input_ids'], chunk_size, overlap)
+            
+            document_title = str(file.split(".")[0])
+            
+            for chunk in chunks:
+                paragraphs.append({"document": document_title, "text": f"Document: {document_title}\n"+tokenizer.decode(chunk)})
+
+        else: 
+            print(file)
                 
-                ## chunks the input into smaller chunks 
-                chunks = split_tokens_with_overlap(tokenized_input['input_ids'], chunk_size, overlap)
-                for chunk in chunks:
-                    paragraphs.append({"document": doc.titles[0].text, "text": tokenizer.decode(chunk)})
-                        
-            else: 
-                print(file)
-                
-        except Exception as e:
-            print("Exception Occured: ", file)
-            pass
+        # except Exception as e:
+        #     print("Exception Occured: ", file)
+        #     pass
         
         ## save after every doc 
         df = pd.DataFrame(paragraphs)
